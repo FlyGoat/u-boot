@@ -283,8 +283,8 @@ always := $(hostprogs-y)
 hostprogs-y += printinitialenv
 
 # Generated LCD/video logo
-LOGO_H = $(objtree)/include/bmp_logo.h
-LOGO_DATA_H = $(objtree)/include/bmp_logo_data.h
+LOGO_H = $(objtree)/include/generated/bmp_logo.h
+LOGO_DATA_H = $(objtree)/include/generated/bmp_logo_data.h
 LOGO-$(CONFIG_VIDEO_LOGO) += $(LOGO_H)
 LOGO-$(CONFIG_VIDEO_LOGO) += $(LOGO_DATA_H)
 

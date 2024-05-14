@@ -62,7 +62,7 @@ static struct splash_location default_splash_locations[] = {
 
 #ifdef CONFIG_VIDEO_LOGO
 
-#include <bmp_logo_data.h>
+#include <generated/bmp_logo_data.h>
 
 static int splash_video_logo_load(void)
 {
@@ -121,7 +121,7 @@ void splash_get_pos(int *x, int *y)
 #if CONFIG_IS_ENABLED(VIDEO) && !CONFIG_IS_ENABLED(HIDE_LOGO_VERSION)
 
 #ifdef CONFIG_VIDEO_LOGO
-#include <bmp_logo.h>
+#include <generated/bmp_logo.h>
 #endif
 #include <dm.h>
 #include <video_console.h>
