@@ -76,4 +76,33 @@ config VIRTIO_RNG
 	help
 	  This is the virtual random number generator driver. It can be used
 	  with QEMU based targets.
+
+ config VIRTIO_GPU
+	bool "virtio GPU driver"
+	depends on VIRTIO && VIDEO
+	default y
+	help
+	  This is the virtual GPU display for virtio. It can be used with QEMU
+	  based targets.
+
+if VIRTIO_GPU
+config VIRTIO_GPU_SIZE_X
+	int "Width of display (X resolution)"
+	default 1280
+	help
+	  Sets the width of the display.
+
+	  These two options control the size of the display set up by QEMU.
+	  Typical size is 1280 x 1024 for compatibility.
+
+config VIRTIO_GPU_SIZE_Y
+	int "High of display (Y resolution)"
+	default 1024
+	help
+	  Sets the height of the display.
+
+	  These two options control the size of the display set up by QEMU.
+	  Typical size is 1280 x 1024 for compatibility.
+
+endif
 endmenu
