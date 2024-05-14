@@ -2191,7 +2191,7 @@ CLEAN_DIRS  += $(MODVERDIR) \
 	       $(foreach d, spl tpl vpl, $(patsubst %,$d/%, \
 			$(filter-out include, $(shell ls -1 $d 2>/dev/null))))
 
-CLEAN_FILES += include/autoconf.mk* include/bmp_logo.h include/bmp_logo_data.h \
+CLEAN_FILES += include/autoconf.mk* include/generated/bmp_*.h \
 	       include/config.h include/generated/env.* drivers/video/u_boot_logo.S \
 	       tools/version.h u-boot* MLO* SPL System.map fit-dtb.blob* \
 	       u-boot-ivt.img.log u-boot-dtb.imx.log SPL.log u-boot.imx.log \
