@@ -12,9 +12,9 @@
 #include <sysinfo.h>
 
 #ifdef CONFIG_VIDEO
-#include <bmp_logo.h>
 #include <splash.h>
 #include <video.h>
+#include <generated/bmp_logo.h>
 #endif
 
 #include "tdx-cfg-block.h"

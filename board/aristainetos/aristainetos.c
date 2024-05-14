@@ -27,7 +27,6 @@
 #include <asm/io.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/sections.h>
-#include <bmp_logo.h>
 #include <dm/root.h>
 #include <env.h>
 #include <i2c_eeprom.h>
@@ -40,6 +39,7 @@
 #include <power/da9063_pmic.h>
 #include <splash.h>
 #include <video.h>
+#include <generated/bmp_logo.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
