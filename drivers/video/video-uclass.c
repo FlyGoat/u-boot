@@ -65,13 +65,6 @@ struct video_uc_priv {
 	ulong video_ptr;
 };
 
-/** struct vid_rgb - Describes a video colour */
-struct vid_rgb {
-	u32 r;
-	u32 g;
-	u32 b;
-};
-
 void video_set_flush_dcache(struct udevice *dev, bool flush)
 {
 	struct video_priv *priv = dev_get_uclass_priv(dev);
@@ -259,7 +252,7 @@ int video_clear(struct udevice *dev)
 	return 0;
 }
 
-static const struct vid_rgb colours[VID_COLOUR_COUNT] = {
+static const struct video_rgb colours[VID_COLOUR_COUNT] = {
 	{ 0x00, 0x00, 0x00 },  /* black */
 	{ 0xc0, 0x00, 0x00 },  /* red */
 	{ 0x00, 0xc0, 0x00 },  /* green */
@@ -281,30 +274,17 @@ static const struct vid_rgb colours[VID_COLOUR_COUNT] = {
 u32 video_index_to_colour(struct video_priv *priv, enum colour_idx idx)
 {
 	switch (priv->bpix) {
+	case VIDEO_BPP8:
+		if (CONFIG_IS_ENABLED(VIDEO_BPP8))
+			return video_rgb_to_pixel8(priv->format, colours[idx]);
+		break;
 	case VIDEO_BPP16:
-		if (CONFIG_IS_ENABLED(VIDEO_BPP16)) {
-			return ((colours[idx].r >> 3) << 11) |
-			       ((colours[idx].g >> 2) <<  5) |
-			       ((colours[idx].b >> 3) <<  0);
-		}
+		if (CONFIG_IS_ENABLED(VIDEO_BPP16))
+			return video_rgb_to_pixel16(priv->format, colours[idx]);
 		break;
 	case VIDEO_BPP32:
-		if (CONFIG_IS_ENABLED(VIDEO_BPP32)) {
-			switch (priv->format) {
-			case VIDEO_X2R10G10B10:
-				return (colours[idx].r << 22) |
-				       (colours[idx].g << 12) |
-				       (colours[idx].b <<  2);
-			case VIDEO_RGBA8888:
-				return (colours[idx].r << 24) |
-				       (colours[idx].g << 16) |
-				       (colours[idx].b << 8) | 0xff;
-			default:
-				return (colours[idx].r << 16) |
-				       (colours[idx].g <<  8) |
-				       (colours[idx].b <<  0);
-			}
-		}
+		if (CONFIG_IS_ENABLED(VIDEO_BPP32))
+			return video_rgb_to_pixel32(priv->format, colours[idx]);
 		break;
 	default:
 		break;
