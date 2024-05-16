@@ -5,8 +5,10 @@
 
 #include <errno.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include <sysreset.h>
+#include <video_format.h>
 #include <linux/input.h>
 #include <SDL2/SDL.h>
 #include <asm/state.h>
@@ -69,6 +71,47 @@ static struct sdl_info {
 	int src_depth;
 } sdl;
 
+static inline SDL_PixelFormatEnum sandbox_video_format(int l2bbp, int format)
+{
+	switch (l2bbp) {
+	case VIDEO_BPP8:
+		switch (format) {
+		case VIDEO_DEFAULT:
+		case VIDEO_RGB332:
+			return SDL_PIXELFORMAT_RGB332;
+		}
+	case VIDEO_BPP16:
+		switch (format) {
+		case VIDEO_DEFAULT:
+		case VIDEO_RGB565:
+			return SDL_PIXELFORMAT_RGB565;
+		default:
+			break;
+		}
+		break;
+	case VIDEO_BPP32:
+		switch (format) {
+		case VIDEO_DEFAULT:
+		case VIDEO_XRGB8888:
+			return SDL_PIXELFORMAT_RGB888;
+		case VIDEO_BGRX8888:
+			return SDL_PIXELFORMAT_BGRX8888;
+		case VIDEO_XBGR8888:
+			return SDL_PIXELFORMAT_BGR888;
+		case VIDEO_RGBA8888:
+			return SDL_PIXELFORMAT_RGBA8888;
+		case VIDEO_XRGB2101010:
+			return SDL_PIXELFORMAT_ARGB2101010;
+		default:
+			break;
+		}
+	default:
+		break;
+	}
+
+	return SDL_PIXELFORMAT_UNKNOWN;
+}
+
 static void sandbox_sdl_poll_events(void)
 {
 	/*
@@ -122,9 +165,10 @@ int sandbox_sdl_remove_display(void)
 }
 
 int sandbox_sdl_init_display(int width, int height, int log2_bpp,
-			     bool double_size)
+			     int format, bool double_size)
 {
 	struct sandbox_state *state = state_get_current();
+	SDL_PixelFormatEnum sdl_format;
 	int err;
 
 	if (!width || !state->show_lcd)
@@ -134,6 +178,12 @@ int sandbox_sdl_init_display(int width, int height, int log2_bpp,
 		return err;
 	if (sdl.renderer)
 		sandbox_sdl_remove_display();
+
+	sdl_format = sandbox_video_format(log2_bpp, format);
+	if (sdl_format == SDL_PIXELFORMAT_UNKNOWN) {
+		printf("Unsupported video format\n");
+		return -EINVAL;
+	}
 
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) {
 		printf("Unable to initialise SDL LCD: %s\n", SDL_GetError());
@@ -153,8 +203,6 @@ int sandbox_sdl_init_display(int width, int height, int log2_bpp,
 		printf("Unable to init hinting: %s", SDL_GetError());
 
 	sdl.src_depth = 1 << log2_bpp;
-	if (log2_bpp != 4 && log2_bpp != 5)
-		log2_bpp = 5;
 	sdl.depth = 1 << log2_bpp;
 	sdl.pitch = sdl.width * sdl.depth / 8;
 	sdl.screen = SDL_CreateWindow("U-Boot", SDL_WINDOWPOS_UNDEFINED,
@@ -174,9 +222,7 @@ int sandbox_sdl_init_display(int width, int height, int log2_bpp,
 		return -EIO;
 	}
 
-	sdl.texture = SDL_CreateTexture(sdl.renderer, log2_bpp == 4 ?
-					SDL_PIXELFORMAT_RGB565 :
-					SDL_PIXELFORMAT_RGB888,
+	sdl.texture = SDL_CreateTexture(sdl.renderer, sdl_format,
 					SDL_TEXTUREACCESS_STREAMING,
 					width, height);
 	if (!sdl.texture) {
