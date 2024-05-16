@@ -31,7 +31,7 @@ static int sandbox_sdl_probe(struct udevice *dev)
 	int ret;
 
 	ret = sandbox_sdl_init_display(plat->xres, plat->yres, plat->bpix,
-				       state->double_lcd);
+				       plat->format, state->double_lcd);
 	if (ret) {
 		puts("LCD init failed\n");
 		return ret;
@@ -39,6 +39,7 @@ static int sandbox_sdl_probe(struct udevice *dev)
 	uc_priv->xsize = plat->xres;
 	uc_priv->ysize = plat->yres;
 	uc_priv->bpix = plat->bpix;
+	uc_priv->format = plat->format;
 	uc_priv->rot = plat->rot;
 	uc_priv->vidconsole_drv_name = plat->vidconsole_drv_name;
 	uc_priv->font_size = plat->font_size;
@@ -48,12 +49,14 @@ static int sandbox_sdl_probe(struct udevice *dev)
 	return 0;
 }
 
-static void set_bpp(struct udevice *dev, enum video_log2_bpp l2bpp)
+static void set_pixel(struct udevice *dev, enum video_log2_bpp l2bpp,
+		      enum video_format format)
 {
 	struct video_uc_plat *uc_plat = dev_get_uclass_plat(dev);
 	struct sandbox_sdl_plat *plat = dev_get_plat(dev);
 
 	plat->bpix = l2bpp;
+	plat->format = format;
 
 	uc_plat->size = plat->xres * plat->yres * VNBYTES(plat->bpix);
 
@@ -61,7 +64,7 @@ static void set_bpp(struct udevice *dev, enum video_log2_bpp l2bpp)
 	 * Set up to the maximum size we'll ever need. This is a strange case.
 	 * The video memory is allocated by video_post_bind() called from
 	 * board_init_r(). If a test changes the reoslution so it needs more
-	 * memory later (with sandbox_sdl_set_bpp()), it is too late to make
+	 * memory later (with sandbox_sdl_set_pixel()), it is too late to make
 	 * the frame buffer larger.
 	 *
 	 * So use a maximum size here.
@@ -79,7 +82,8 @@ static void set_bpp(struct udevice *dev, enum video_log2_bpp l2bpp)
 		uc_plat->size *= 2;
 }
 
-int sandbox_sdl_set_bpp(struct udevice *dev, enum video_log2_bpp l2bpp)
+int sandbox_sdl_set_pixel(struct udevice *dev, enum video_log2_bpp l2bpp,
+			  enum video_format format)
 {
 	struct video_uc_plat *uc_plat = dev_get_uclass_plat(dev);
 	int ret;
@@ -89,7 +93,7 @@ int sandbox_sdl_set_bpp(struct udevice *dev, enum video_log2_bpp l2bpp)
 	sandbox_sdl_remove_display();
 
 	uc_plat->hide_logo = true;
-	set_bpp(dev, l2bpp);
+	set_pixel(dev, l2bpp, format);
 
 	ret = device_probe(dev);
 	if (ret)
@@ -122,7 +126,7 @@ static int sandbox_sdl_bind(struct udevice *dev)
 	l2bpp = dev_read_u32_default(dev, "log2-depth", VIDEO_BPP16);
 	plat->rot = dev_read_u32_default(dev, "rotate", 0);
 
-	set_bpp(dev, l2bpp);
+	set_pixel(dev, l2bpp, VIDEO_DEFAULT);
 
 	return ret;
 }
