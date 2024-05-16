@@ -471,6 +471,7 @@ efi_status_t efi_gop_register(void)
 	struct udevice *vdev;
 	struct video_priv *priv;
 	struct video_uc_plat *plat;
+	struct video_ops *ops;
 
 	/* We only support a single video output device for now */
 	if (uclass_first_device_err(UCLASS_VIDEO, &vdev)) {
@@ -485,6 +486,7 @@ efi_status_t efi_gop_register(void)
 	row = video_get_ysize(vdev);
 
 	plat = dev_get_uclass_plat(vdev);
+	ops = video_get_ops(vdev);
 	fb_base = IS_ENABLED(CONFIG_VIDEO_COPY) ? plat->copy_base : plat->base;
 	fb_size = plat->size;
 
@@ -529,7 +531,11 @@ efi_status_t efi_gop_register(void)
 	gopobj->info.version = 0;
 	gopobj->info.width = col;
 	gopobj->info.height = row;
-	if (bpix == VIDEO_BPP32)
+
+	if (ops && ops->video_sync) {
+		/* Applications can't really use it as framebuffer */
+		gopobj->info.pixel_format = EFI_GOT_BLTONLY;
+	} else if (bpix == VIDEO_BPP32)
 	{
 		if (format == VIDEO_X2R10G10B10) {
 			gopobj->info.pixel_format = EFI_GOT_BITMASK;
