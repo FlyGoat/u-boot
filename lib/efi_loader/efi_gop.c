@@ -531,7 +531,7 @@ efi_status_t efi_gop_register(void)
 	gopobj->info.height = row;
 	if (bpix == VIDEO_BPP32)
 	{
-		if (format == VIDEO_X2R10G10B10) {
+		if (format == VIDEO_XRGB2101010) {
 			gopobj->info.pixel_format = EFI_GOT_BITMASK;
 			gopobj->info.pixel_bitmask[0] = 0x3ff00000; /* red */
 			gopobj->info.pixel_bitmask[1] = 0x000ffc00; /* green */

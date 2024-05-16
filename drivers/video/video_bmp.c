@@ -80,7 +80,7 @@ static void write_pix8(u8 *fb, uint bpix, enum video_format eformat,
 			*fb++ = cte->red;
 			*fb++ = cte->green;
 			*fb++ = cte->blue;
-		} else if (eformat == VIDEO_X2R10G10B10) {
+		} else if (eformat == VIDEO_XRGB2101010) {
 			*(u32 *)fb = get_bmp_col_x2r10g10b10(cte);
 		} else if (eformat == VIDEO_RGBA8888) {
 			*(u32 *)fb = get_bmp_col_rgba8888(cte);
@@ -385,7 +385,7 @@ int video_bmp_display(struct udevice *dev, ulong bmp_image, int x, int y,
 							(bmap[0] >> 3);
 						bmap += 3;
 						fb += 2;
-					} else if (eformat == VIDEO_X2R10G10B10) {
+					} else if (eformat == VIDEO_XRGB2101010) {
 						u32 pix;
 
 						pix = *bmap++ << 2U;
@@ -422,7 +422,7 @@ int video_bmp_display(struct udevice *dev, ulong bmp_image, int x, int y,
 		if (CONFIG_IS_ENABLED(BMP_32BPP)) {
 			for (i = 0; i < height; ++i) {
 				for (j = 0; j < width; j++) {
-					if (eformat == VIDEO_X2R10G10B10) {
+					if (eformat == VIDEO_XRGB2101010) {
 						u32 pix;
 
 						pix = *bmap++ << 2U;
