@@ -24,7 +24,7 @@
  *		and -EPERM if the video failed to come up.
  */
 int sandbox_sdl_init_display(int width, int height, int log2_bpp,
-			     bool double_size);
+			     int format, bool double_size);
 
 /**
  * sandbox_sdl_remove_display() - Remove the SDL screen
@@ -89,12 +89,13 @@ int sandbox_sdl_sound_stop(void);
 int sandbox_sdl_sound_init(int rate, int channels);
 
 /**
- * sandbox_sdl_set_bpp() - Set the depth of the sandbox display
+ * sandbox_sdl_set_pixel() - Set depth and format of the sandbox display
  *
  * The device must not be active when this function is called. It activiates it
  * before returning.
  *
- * This updates the depth value and adjusts a few other settings accordingly.
+ * This updates the depth value and pixel format for the sandbox display, then
+ * it adjusts a few other settings accordingly.
  * It must be called before the display is probed.
  *
  * @dev: Device to adjust
@@ -102,11 +103,12 @@ int sandbox_sdl_sound_init(int rate, int channels);
  * Return: 0 if the device was already active, other error if it fails to probe
  * after the change
  */
-int sandbox_sdl_set_bpp(struct udevice *dev, enum video_log2_bpp l2bpp);
+int sandbox_sdl_set_pixel(struct udevice *dev, enum video_log2_bpp l2bpp,
+			  enum video_format format);
 
 #else
 static inline int sandbox_sdl_init_display(int width, int height, int log2_bpp,
-					   bool double_size)
+					   int format, bool double_size)
 {
 	return -ENODEV;
 }
@@ -151,8 +153,9 @@ static inline int sandbox_sdl_sound_init(int rate, int channels)
 	return -ENODEV;
 }
 
-static inline int sandbox_sdl_set_bpp(struct udevice *dev,
-				      enum video_log2_bpp l2bpp)
+static inline int sandbox_sdl_set_pixel(struct udevice *dev,
+					enum video_log2_bpp l2bpp,
+					enum video_format format)
 {
 	return -ENOSYS;
 }

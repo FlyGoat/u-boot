@@ -395,7 +395,7 @@ static int dm_test_video_bmp8(struct unit_test_state *uts)
 
 	ut_assertok(uclass_find_first_device(UCLASS_VIDEO, &dev));
 	ut_assertnonnull(dev);
-	ut_assertok(sandbox_sdl_set_bpp(dev, VIDEO_BPP8));
+	ut_assertok(sandbox_sdl_set_pixel(dev, VIDEO_BPP8, VIDEO_DEFAULT));
 
 	ut_assertok(read_file(uts, "tools/logos/denx.bmp", &addr));
 
@@ -416,7 +416,7 @@ static int dm_test_video_bmp16(struct unit_test_state *uts)
 
 	ut_assertok(uclass_find_first_device(UCLASS_VIDEO, &dev));
 	ut_assertnonnull(dev);
-	ut_assertok(sandbox_sdl_set_bpp(dev, VIDEO_BPP16));
+	ut_assertok(sandbox_sdl_set_pixel(dev, VIDEO_BPP16, VIDEO_DEFAULT));
 
 	ut_assertok(read_file(uts, "tools/logos/denx-16bpp.bmp.gz", &src));
 	ut_assertok(gunzip(map_sysmem(dst, 0), dst_len, map_sysmem(src, 0),
@@ -439,7 +439,7 @@ static int dm_test_video_bmp24(struct unit_test_state *uts)
 
 	ut_assertok(uclass_find_first_device(UCLASS_VIDEO, &dev));
 	ut_assertnonnull(dev);
-	ut_assertok(sandbox_sdl_set_bpp(dev, VIDEO_BPP16));
+	ut_assertok(sandbox_sdl_set_pixel(dev, VIDEO_BPP16, VIDEO_DEFAULT));
 
 	ut_assertok(read_file(uts, "tools/logos/denx-24bpp.bmp.gz", &src));
 	ut_assertok(gunzip(map_sysmem(dst, 0), dst_len, map_sysmem(src, 0),
@@ -462,7 +462,7 @@ static int dm_test_video_bmp24_32(struct unit_test_state *uts)
 
 	ut_assertok(uclass_find_first_device(UCLASS_VIDEO, &dev));
 	ut_assertnonnull(dev);
-	ut_assertok(sandbox_sdl_set_bpp(dev, VIDEO_BPP32));
+	ut_assertok(sandbox_sdl_set_pixel(dev, VIDEO_BPP32, VIDEO_DEFAULT));
 
 	ut_assertok(read_file(uts, "tools/logos/denx-24bpp.bmp.gz", &src));
 	ut_assertok(gunzip(map_sysmem(dst, 0), dst_len, map_sysmem(src, 0),
@@ -483,7 +483,7 @@ static int dm_test_video_bmp32(struct unit_test_state *uts)
 
 	ut_assertok(uclass_find_first_device(UCLASS_VIDEO, &dev));
 	ut_assertnonnull(dev);
-	ut_assertok(sandbox_sdl_set_bpp(dev, VIDEO_BPP32));
+	ut_assertok(sandbox_sdl_set_pixel(dev, VIDEO_BPP32, VIDEO_DEFAULT));
 	ut_assertok(read_file(uts, "tools/logos/denx.bmp", &addr));
 
 	ut_assertok(video_bmp_display(dev, addr, 0, 0, false));
@@ -517,7 +517,7 @@ static int dm_test_video_comp_bmp32(struct unit_test_state *uts)
 
 	ut_assertok(uclass_find_first_device(UCLASS_VIDEO, &dev));
 	ut_assertnonnull(dev);
-	ut_assertok(sandbox_sdl_set_bpp(dev, VIDEO_BPP32));
+	ut_assertok(sandbox_sdl_set_pixel(dev, VIDEO_BPP32, VIDEO_DEFAULT));
 
 	ut_assertok(read_file(uts, "tools/logos/denx.bmp", &addr));
 
@@ -536,7 +536,7 @@ static int dm_test_video_comp_bmp8(struct unit_test_state *uts)
 
 	ut_assertok(uclass_find_first_device(UCLASS_VIDEO, &dev));
 	ut_assertnonnull(dev);
-	ut_assertok(sandbox_sdl_set_bpp(dev, VIDEO_BPP8));
+	ut_assertok(sandbox_sdl_set_pixel(dev, VIDEO_BPP8, VIDEO_DEFAULT));
 
 	ut_assertok(read_file(uts, "tools/logos/denx.bmp", &addr));
 

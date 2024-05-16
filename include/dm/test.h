@@ -153,6 +153,7 @@ extern struct unit_test_state global_dm_test_state;
  * @xres: Width of display in pixels
  * @yres: Height of display in pixels
  * @bpix: Log2 of bits per pixel (enum video_log2_bpp)
+ * @format: Pixel format (enum video_format)
  * @rot: Console rotation (0=normal orientation, 1=90 degrees clockwise,
  *	2=upside down, 3=90 degree counterclockwise)
  * @vidconsole_drv_name: Name of video console driver (set by tests)
@@ -162,6 +163,7 @@ struct sandbox_sdl_plat {
 	int xres;
 	int yres;
 	int bpix;
+	int format;
 	int rot;
 	const char *vidconsole_drv_name;
 	int font_size;
