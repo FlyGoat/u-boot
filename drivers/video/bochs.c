@@ -65,6 +65,14 @@ static int bochs_init_fb(struct udevice *dev)
 	uc_priv->ysize = ysize;
 	uc_priv->bpix = VIDEO_BPP32;
 
+#if defined(__powerpc__) && defined(__BIG_ENDIAN)
+	uc_priv->format = VIDEO_XRGB8888_BE;
+	writel(0xbebebebe, mmio + 0x604);
+#else
+	uc_priv->format = VIDEO_XRGB8888;
+	writel(0x1e1e1e1e, mmio + 0x604);
+#endif
+
 	/* setup video mode */
 	bochs_write(mmio, INDEX_ENABLE,  0);
 	bochs_write(mmio, INDEX_BANK,  0);
