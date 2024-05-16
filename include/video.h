@@ -8,6 +8,8 @@
 #define _VIDEO_H_
 
 #include <stdio_dev.h>
+#include <video_format.h>
+#include <asm/byteorder.h>
 
 struct udevice;
 
@@ -42,35 +44,6 @@ struct video_uc_plat {
 enum video_polarity {
 	VIDEO_ACTIVE_HIGH,	/* Pins are active high */
 	VIDEO_ACTIVE_LOW,	/* Pins are active low */
-};
-
-/*
- * Bits per pixel selector. Each value n is such that the bits-per-pixel is
- * 2 ^ n
- */
-enum video_log2_bpp {
-	VIDEO_BPP1	= 0,
-	VIDEO_BPP2,
-	VIDEO_BPP4,
-	VIDEO_BPP8,
-	VIDEO_BPP16,
-	VIDEO_BPP32,
-};
-
-/*
- * Convert enum video_log2_bpp to bytes and bits. Note we omit the outer
- * brackets to allow multiplication by fractional pixels.
- */
-#define VNBYTES(bpix)	((1 << (bpix)) / 8)
-
-#define VNBITS(bpix)	(1 << (bpix))
-
-enum video_format {
-	VIDEO_UNKNOWN,
-	VIDEO_RGBA8888,
-	VIDEO_X8B8G8R8,
-	VIDEO_X8R8G8B8,
-	VIDEO_X2R10G10B10,
 };
 
 /**
