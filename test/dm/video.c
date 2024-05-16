@@ -400,7 +400,7 @@ static int dm_test_video_bmp8(struct unit_test_state *uts)
 	ut_assertok(read_file(uts, "tools/logos/denx.bmp", &addr));
 
 	ut_assertok(video_bmp_display(dev, addr, 0, 0, false));
-	ut_asserteq(1247, compress_frame_buffer(uts, dev));
+	ut_asserteq(1118, compress_frame_buffer(uts, dev));
 
 	return 0;
 }
@@ -541,7 +541,7 @@ static int dm_test_video_comp_bmp8(struct unit_test_state *uts)
 	ut_assertok(read_file(uts, "tools/logos/denx.bmp", &addr));
 
 	ut_assertok(video_bmp_display(dev, addr, 0, 0, false));
-	ut_asserteq(1247, compress_frame_buffer(uts, dev));
+	ut_asserteq(1118, compress_frame_buffer(uts, dev));
 
 	return 0;
 }

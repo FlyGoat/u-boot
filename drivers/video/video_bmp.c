@@ -18,42 +18,6 @@
 #define BMP_RLE8_DELTA		2
 
 /**
- * get_bmp_col_16bpp() - Convert a colour-table entry into a 16bpp pixel value
- *
- * Return: value to write to the 16bpp frame buffer for this palette entry
- */
-static uint get_bmp_col_16bpp(struct bmp_color_table_entry cte)
-{
-	return ((cte.red   << 8) & 0xf800) |
-		((cte.green << 3) & 0x07e0) |
-		((cte.blue  >> 3) & 0x001f);
-}
-
-/**
- * get_bmp_col_x2r10g10b10() - Convert a colour-table entry into a x2r10g10b10  pixel value
- *
- * Return: value to write to the x2r10g10b10 frame buffer for this palette entry
- */
-static u32 get_bmp_col_x2r10g10b10(struct bmp_color_table_entry *cte)
-{
-	return ((cte->red << 22U) |
-		(cte->green << 12U) |
-		(cte->blue << 2U));
-}
-
-/**
- * get_bmp_col_rgba8888() - Convert a colour-table entry into a rgba8888 pixel value
- *
- * Return: value to write to the rgba8888 frame buffer for this palette entry
- */
-static u32 get_bmp_col_rgba8888(struct bmp_color_table_entry *cte)
-{
-	return ((cte->red) |
-		(cte->green << 8U) |
-		(cte->blue << 16U) | 0xff << 24U);
-}
-
-/**
  * write_pix8() - Write a pixel from a BMP image into the framebuffer
  *
  * This handles frame buffers with 8, 16, 24 or 32 bits per pixel
@@ -63,33 +27,37 @@ static u32 get_bmp_col_rgba8888(struct bmp_color_table_entry *cte)
  * @palette: BMP palette table
  * @bmap: Pointer to BMP bitmap position to write. This contains a single byte
  *	which is either written directly (bpix == 8) or used to look up the
- *	palette to get a colour to write
+ *	palette to get a colour to write, NULL if it's a pseudo palette with one entry.
  */
 static void write_pix8(u8 *fb, uint bpix, enum video_format eformat,
 		       struct bmp_color_table_entry *palette, u8 *bmap)
 {
-	if (bpix == 8) {
-		*fb++ = *bmap;
-	} else if (bpix == 16) {
-		*(u16 *)fb = get_bmp_col_16bpp(palette[*bmap]);
-	} else {
-		/* Only support big endian */
-		struct bmp_color_table_entry *cte = &palette[*bmap];
+	const int entry = bmap ? *bmap : 0;
+	const struct video_rgb rgb = {
+		.r = palette[entry].red,
+		.g = palette[entry].green,
+		.b = palette[entry].blue
+	};
 
-		if (bpix == 24) {
-			*fb++ = cte->red;
-			*fb++ = cte->green;
-			*fb++ = cte->blue;
-		} else if (eformat == VIDEO_XRGB2101010) {
-			*(u32 *)fb = get_bmp_col_x2r10g10b10(cte);
-		} else if (eformat == VIDEO_RGBA8888) {
-			*(u32 *)fb = get_bmp_col_rgba8888(cte);
-		} else {
-			*fb++ = cte->blue;
-			*fb++ = cte->green;
-			*fb++ = cte->red;
-			*fb++ = 0;
-		}
+	switch (bpix) {
+#if CONFIG_IS_ENABLED(VIDEO_BPP8)
+	case 8:
+		*(u8 *)fb = video_rgb_to_pixel8(eformat, rgb);
+		break;
+#endif
+#if CONFIG_IS_ENABLED(VIDEO_BPP16)
+	case 16:
+		*(u16 *)fb = video_rgb_to_pixel16(eformat, rgb);
+		break;
+#endif
+#if CONFIG_IS_ENABLED(VIDEO_BPP32)
+	case 32:
+		*(u32 *)fb = video_rgb_to_pixel32(eformat, rgb);
+		break;
+#endif
+	default:
+		log_debug("Unsupported BPP %d for BMP\n", bpix);
+		break;
 	}
 }
 
@@ -266,6 +234,7 @@ int video_bmp_display(struct udevice *dev, ulong bmp_image, int x, int y,
 	unsigned colours, bpix, bmp_bpix;
 	enum video_format eformat;
 	struct bmp_color_table_entry *palette;
+	struct bmp_color_table_entry pseudo_cte __maybe_unused;
 	int hdr_size;
 	int ret;
 
@@ -291,21 +260,6 @@ int video_bmp_display(struct udevice *dev, ulong bmp_image, int x, int y,
 		       bpix, bmp_bpix);
 
 		return -EINVAL;
-	}
-
-	/*
-	 * We support displaying 8bpp and 24bpp BMPs on 16bpp LCDs
-	 * and displaying 24bpp BMPs on 32bpp LCDs
-	 */
-	if (bpix != bmp_bpix &&
-	    !(bmp_bpix == 8 && bpix == 16) &&
-	    !(bmp_bpix == 8 && bpix == 24) &&
-	    !(bmp_bpix == 8 && bpix == 32) &&
-	    !(bmp_bpix == 24 && bpix == 16) &&
-	    !(bmp_bpix == 24 && bpix == 32)) {
-		printf("Error: %d bit/pixel mode, but BMP has %d bit/pixel\n",
-		       bpix, colours);
-		return -EPERM;
 	}
 
 	debug("Display-bmp: %d x %d  with %d colours, display %d\n",
@@ -354,10 +308,10 @@ int video_bmp_display(struct udevice *dev, ulong bmp_image, int x, int y,
 			for (j = 0; j < width; j++) {
 				write_pix8(fb, bpix, eformat, palette, bmap);
 				bmap++;
-				fb += bpix / 8;
+				fb += bpix / BITS_PER_BYTE;
 			}
 			bmap += (padded_width - width);
-			fb -= byte_width + priv->line_length;
+			fb -= priv->line_length + width * (bpix / BITS_PER_BYTE);
 		}
 		break;
 	case 16:
@@ -365,93 +319,52 @@ int video_bmp_display(struct udevice *dev, ulong bmp_image, int x, int y,
 			for (i = 0; i < height; ++i) {
 				schedule();
 				for (j = 0; j < width; j++) {
-					*fb++ = *bmap++;
-					*fb++ = *bmap++;
+					u16 bmp_rgb = le16_to_cpu(*(u16 *)bmap);
+					/* RGB565 */
+					pseudo_cte.red = ((bmp_rgb & 0xf800) >> 11) << 3;
+					pseudo_cte.green = ((bmp_rgb & 0x7e0) >> 5) << 2;
+					pseudo_cte.blue = (bmp_rgb & 0x1F) << 3;
+					write_pix8(fb, bpix, eformat, &pseudo_cte, NULL);
+					fb += (bpix / BITS_PER_BYTE);
+					bmap += (bmp_bpix / BITS_PER_BYTE);
 				}
 				bmap += (padded_width - width);
-				fb -= width * 2 + priv->line_length;
+				fb -= priv->line_length + width * (bpix / BITS_PER_BYTE);
 			}
 		}
 		break;
 	case 24:
 		if (CONFIG_IS_ENABLED(BMP_24BPP)) {
 			for (i = 0; i < height; ++i) {
+				schedule();
 				for (j = 0; j < width; j++) {
-					if (bpix == 16) {
-						/* 16bit 565RGB format */
-						*(u16 *)fb = ((bmap[2] >> 3)
-							<< 11) |
-							((bmap[1] >> 2) << 5) |
-							(bmap[0] >> 3);
-						bmap += 3;
-						fb += 2;
-					} else if (eformat == VIDEO_XRGB2101010) {
-						u32 pix;
-
-						pix = *bmap++ << 2U;
-						pix |= *bmap++ << 12U;
-						pix |= *bmap++ << 22U;
-						*fb++ = pix & 0xff;
-						*fb++ = (pix >> 8) & 0xff;
-						*fb++ = (pix >> 16) & 0xff;
-						*fb++ = pix >> 24;
-					} else if (eformat == VIDEO_RGBA8888) {
-						u32 pix;
-
-						pix = *bmap++ << 8U; /* blue */
-						pix |= *bmap++ << 16U; /* green */
-						pix |= *bmap++ << 24U; /* red */
-
-						*fb++ = (pix >> 24) & 0xff;
-						*fb++ = (pix >> 16) & 0xff;
-						*fb++ = (pix >> 8) & 0xff;
-						*fb++ = 0xff;
-					} else {
-						*fb++ = *bmap++;
-						*fb++ = *bmap++;
-						*fb++ = *bmap++;
-						*fb++ = 0;
-					}
+					pseudo_cte.blue = *bmap++;
+					pseudo_cte.green = *bmap++;
+					pseudo_cte.red = *bmap++;
+					write_pix8(fb, bpix, eformat, &pseudo_cte, NULL);
+					fb += (bpix / BITS_PER_BYTE);
 				}
-				fb -= priv->line_length + width * (bpix / 8);
 				bmap += (padded_width - width);
+				fb -= priv->line_length + width * (bpix / BITS_PER_BYTE);
 			}
 		}
 		break;
 	case 32:
 		if (CONFIG_IS_ENABLED(BMP_32BPP)) {
 			for (i = 0; i < height; ++i) {
+				schedule();
 				for (j = 0; j < width; j++) {
-					if (eformat == VIDEO_XRGB2101010) {
-						u32 pix;
-
-						pix = *bmap++ << 2U;
-						pix |= *bmap++ << 12U;
-						pix |= *bmap++ << 22U;
-						pix |= (*bmap++ >> 6) << 30U;
-						*fb++ = pix & 0xff;
-						*fb++ = (pix >> 8) & 0xff;
-						*fb++ = (pix >> 16) & 0xff;
-						*fb++ = pix >> 24;
-					} else if (eformat == VIDEO_RGBA8888) {
-						u32 pix;
-
-						pix = *bmap++ << 8U; /* blue */
-						pix |= *bmap++ << 16U; /* green */
-						pix |= *bmap++ << 24U; /* red */
-						bmap++;
-						*fb++ = (pix >> 24) & 0xff;
-						*fb++ = (pix >> 16) & 0xff;
-						*fb++ = (pix >> 8) & 0xff;
-						*fb++ = 0xff; /* opacity */
-					} else {
-						*fb++ = *bmap++;
-						*fb++ = *bmap++;
-						*fb++ = *bmap++;
-						*fb++ = *bmap++;
-					}
+					u32 bmp_rgb = le32_to_cpu(*(u32 *)bmap);
+					/* RGBX8888 */
+					pseudo_cte.red = (bmp_rgb >> 24) & 0xff;
+					pseudo_cte.green = (bmp_rgb >> 16) & 0xff;
+					pseudo_cte.blue =  (bmp_rgb >> 8) & 0xff;
+					write_pix8(fb, bpix, eformat, &pseudo_cte, NULL);
+					fb += (bpix / BITS_PER_BYTE);
+					bmap += (bmp_bpix / BITS_PER_BYTE);
 				}
-				fb -= priv->line_length + width * (bpix / 8);
+				bmap += (padded_width - width);
+				fb -= priv->line_length + width * (bpix / BITS_PER_BYTE);
 			}
 		}
 		break;
