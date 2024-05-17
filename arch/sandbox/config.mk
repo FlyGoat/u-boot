@@ -4,13 +4,12 @@
 PLATFORM_CPPFLAGS += -D__SANDBOX__ -U_FORTIFY_SOURCE
 PLATFORM_CPPFLAGS += -fPIC -ffunction-sections -fdata-sections
 PLATFORM_LIBS += -lrt
-SDL_CONFIG ?= sdl2-config
 
 # Define this to avoid linking with SDL, which requires SDL libraries
 # This can solve 'sdl-config: Command not found' errors
 ifeq ($(CONFIG_SANDBOX_SDL),y)
-PLATFORM_LIBS += $(shell $(SDL_CONFIG) --libs)
-PLATFORM_CPPFLAGS += $(shell $(SDL_CONFIG) --cflags)
+PLATFORM_LIBS += $(shell $(PKG_CONFIG) sdl2 --libs)
+PLATFORM_CPPFLAGS += $(shell $(PKG_CONFIG) sdl2 --cflags)
 endif
 
 SANITIZERS :=
