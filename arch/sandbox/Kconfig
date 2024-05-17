@@ -47,6 +47,29 @@ config HOST_32BIT
 config HOST_64BIT
 	def_bool $(cc-define,_LP64)
 
+config HOST_ARCH_X86
+	def_bool $(cc-define,__i386__)
+
+config HOST_ARCH_X86_64
+	def_bool $(cc-define,__x86_64__)
+
+config HOST_ARCH_ARM
+	def_bool $(cc-define,__arm__)
+
+config HOST_ARCH_AARCH64
+	def_bool $(cc-define,__aarch64__)
+
+config HOST_ARCH_RISCV32
+	def_bool $(cc-define,__riscv_xlen 32)
+
+config HOST_ARCH_RISCV64
+	def_bool $(cc-define,__riscv_xlen 64)
+
+config HOST_ARCH_UNKNOWN
+	def_bool !HOST_ARCH_X86 && !HOST_ARCH_X86_64 && \
+		 !HOST_ARCH_ARM && !HOST_ARCH_AARCH64 && \
+		 !HOST_ARCH_RISCV32 && !HOST_ARCH_RISCV64
+
 config HOST_HAS_SDL
 	def_bool $(success,sdl2-config --version)
 

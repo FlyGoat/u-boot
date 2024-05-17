@@ -36,11 +36,11 @@ efi_status_t EFIAPI efi_main(efi_handle_t handle,
 #elif defined(CONFIG_X86)
 	asm volatile (".word 0xffff\n");
 #elif defined(CONFIG_SANDBOX)
-#if (HOST_ARCH == HOST_ARCH_ARM || HOST_ARCH == HOST_ARCH_AARCH64)
+#if (CONFIG_IS_ENABLED(HOST_ARCH_ARM) || CONFIG_IS_ENABLED(HOST_ARCH_AARCH64))
 	asm volatile (".word 0xe7f7defb\n");
-#elif (HOST_ARCH == HOST_ARCH_RISCV32 || HOST_ARCH == HOST_ARCH_RISCV64)
+#elif (CONFIG_IS_ENABLED(HOST_ARCH_RISCV32) || CONFIG_IS_ENABLED(HOST_ARCH_RISCV64))
 	asm volatile (".word 0xffffffff\n");
-#elif (HOST_ARCH == HOST_ARCH_X86 || HOST_ARCH == HOST_ARCH_X86_64)
+#elif (CONFIG_IS_ENABLED(HOST_ARCH_X86) || CONFIG_IS_ENABLED(HOST_ARCH_X86_64))
 	asm volatile (".word 0xffff\n");
 #endif
 #endif

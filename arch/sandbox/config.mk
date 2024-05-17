@@ -44,27 +44,27 @@ cmd_u-boot-spl = (cd $(obj) && $(CC) -o $(SPL_BIN) -Wl,-T u-boot-spl.lds \
 	-Wl,--no-whole-archive \
 	$(PLATFORM_LIBS) -Wl,-Map -Wl,u-boot-spl.map -Wl,--gc-sections)
 
-ifeq ($(HOST_ARCH),$(HOST_ARCH_X86_64))
+ifeq ($(CONFIG_HOST_ARCH_X86_64),y)
 EFI_LDS := ${SRCDIR}/../../../arch/x86/lib/elf_x86_64_efi.lds
 EFI_TARGET := --target=efi-app-x86_64
-else ifeq ($(HOST_ARCH),$(HOST_ARCH_X86))
+else ifeq ($(CONFIG_HOST_ARCH_X86),y)
 EFI_LDS := ${SRCDIR}/../../../arch/x86/lib/elf_ia32_efi.lds
 EFI_TARGET := --target=efi-app-ia32
-else ifeq ($(HOST_ARCH),$(HOST_ARCH_AARCH64))
+else ifeq ($(CONFIG_HOST_ARCH_AARCH64),y)
 EFI_LDS := ${SRCDIR}/../../../arch/arm/lib/elf_aarch64_efi.lds
 OBJCOPYFLAGS += -j .text -j .secure_text -j .secure_data -j .rodata -j .data \
 		-j __u_boot_list -j .rela.dyn -j .got -j .got.plt \
 		-j .binman_sym_table -j .text_rest \
 		-j .efi_runtime -j .efi_runtime_rel
-else ifeq ($(HOST_ARCH),$(HOST_ARCH_ARM))
+else ifeq ($(CONFIG_HOST_ARCH_ARM),y)
 EFI_LDS := ${SRCDIR}/../../../arch/arm/lib/elf_arm_efi.lds
 OBJCOPYFLAGS += -j .text -j .secure_text -j .secure_data -j .rodata -j .hash \
 		-j .data -j .got -j .got.plt -j __u_boot_list -j .rel.dyn \
 		-j .binman_sym_table -j .text_rest \
 		-j .efi_runtime -j .efi_runtime_rel
-else ifeq ($(HOST_ARCH),$(HOST_ARCH_RISCV32))
+else ifeq ($(CONFIG_HOST_ARCH_RISCV32),y)
 EFI_LDS := ${SRCDIR}/../../../arch/riscv/lib/elf_riscv32_efi.lds
-else ifeq ($(HOST_ARCH),$(HOST_ARCH_RISCV64))
+else ifeq ($(CONFIG_HOST_ARCH_RISCV64),y)
 EFI_LDS := ${SRCDIR}/../../../arch/riscv/lib/elf_riscv64_efi.lds
 endif
 EFI_CRT0 := crt0_sandbox_efi.o
