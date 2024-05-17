@@ -526,12 +526,6 @@ For debugging with GDB or LLDB, it is preferable to reduce the compiler
 optimization level (CONFIG_CC_OPTIMIZE_FOR_DEBUG=y) and to disable Link Time
 Optimization (CONFIG_LTO=n).
 
-SDL_CONFIG
-----------
-
-If sdl-config is on a different path from the default, set the SDL_CONFIG
-environment variable to the correct pathname before building U-Boot.
-
 
 Using valgrind / memcheck
 -------------------------

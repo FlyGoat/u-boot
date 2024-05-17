@@ -71,7 +71,7 @@ config HOST_ARCH_UNKNOWN
 		 !HOST_ARCH_RISCV32 && !HOST_ARCH_RISCV64
 
 config HOST_HAS_SDL
-	def_bool $(success,sdl2-config --version)
+	def_bool $(success,$(PKG_CONFIG) sdl2)
 
 config SANDBOX_SDL
 	bool "Enable SDL2 support in sandbox"
