@@ -99,14 +99,14 @@ static inline void __raw_readsl(unsigned long addr, void *data, int longlen)
 #define smp_processor_id()	0
 
 #define writeb(v,c)	({ u8  __v = v; __iowmb(); __arch_putb(__v,c); __v; })
-#define writew(v,c)	({ u16 __v = v; __iowmb(); __arch_putw(__v,c); __v; })
-#define writel(v,c)	({ u32 __v = v; __iowmb(); __arch_putl(__v,c); __v; })
-#define writeq(v,c)	({ u64 __v = v; __iowmb(); __arch_putq(__v,c); __v; })
+#define writew(v,c)	({ u16 __v = v; __iowmb(); __arch_putw((__force u16)cpu_to_le16(__v), c); __v; })
+#define writel(v,c)	({ u32 __v = v; __iowmb(); __arch_putl((__force u32)cpu_to_le32(__v), c); __v; })
+#define writeq(v,c)	({ u64 __v = v; __iowmb(); __arch_putq((__force u64)cpu_to_le64(__v), c); __v; })
 
 #define readb(c)	({ u8  __v = __arch_getb(c); __iormb(); __v; })
-#define readw(c)	({ u16 __v = __arch_getw(c); __iormb(); __v; })
-#define readl(c)	({ u32 __v = __arch_getl(c); __iormb(); __v; })
-#define readq(c)	({ u64 __v = __arch_getq(c); __iormb(); __v; })
+#define readw(c)	({ u16 __v = le16_to_cpu((__force __le16)__arch_getw(c)); __iormb(); __v; })
+#define readl(c)	({ u32 __v = le32_to_cpu((__force __le32)__arch_getl(c)); __iormb(); __v; })
+#define readq(c)	({ u64 __v = le64_to_cpu((__force __le64)__arch_getq(c)); __iormb(); __v; })
 
 /*
  * Relaxed I/O memory access primitives. These follow the Device memory
