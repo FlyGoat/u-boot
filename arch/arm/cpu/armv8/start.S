@@ -9,6 +9,7 @@
 #include <linux/linkage.h>
 #include <asm/macro.h>
 #include <asm/armv8/mmu.h>
+#include <asm/assembler.h>
 
 /*************************************************************************
  *
@@ -53,6 +54,31 @@ _bss_end_ofs:
 	.quad	__bss_end - _start
 
 reset:
+#if CONFIG_IS_ENABLED(ARMV8_RESET_SET_ENDIAN)
+	switch_el x16, 3f, 2f, 1f
+3:	mrs	x16, sctlr_el3
+CPU_BE(	mov	x17, #(CR_EE))
+CPU_BE(	orr	x16, x17, x16)
+CPU_LE(	mov	x17, #~(CR_EE))
+CPU_LE(	and	x16, x17, x16)
+	msr	sctlr_el3, x16
+	isb
+2:	mrs	x16, sctlr_el2
+CPU_BE(	mov	x17, #(CR_EE | CR_E0E))
+CPU_BE(	orr	x16, x17, x16)
+CPU_LE(	mov	x17, #~(CR_EE | CR_E0E))
+CPU_LE(	and	x16, x17, x16)
+	msr	sctlr_el2, x16
+	isb
+1:	mrs	x16, sctlr_el1
+CPU_BE(	mov	x17, #(CR_EE | CR_E0E))
+CPU_BE(	orr	x16, x17, x16)
+CPU_LE(	mov	x17, #~(CR_EE | CR_E0E))
+CPU_LE(	and	x16, x17, x16)
+	msr	sctlr_el1, x16
+0:	isb
+#endif
+
 	/* Allow the board to save important registers */
 	b	save_boot_params
 .globl	save_boot_params_ret
