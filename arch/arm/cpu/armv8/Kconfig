@@ -14,6 +14,15 @@ config ARMV8_SPL_EXCEPTION_VECTORS
 	  Say N here if you are running out of code space in the image
 	  and want to save some space at the cost of less debugging info.
 
+config ARMV8_RESET_SET_ENDIAN
+	bool "Set CPU endianness at reset entry"
+	help
+	  Perform endianness setting with SCTLR_ELx registers at U-Boot's
+	  reset entry.
+
+	  Say Y here if your CPU may comes out of reset in a different
+	  endianness.
+
 config ARMV8_MULTIENTRY
         bool "Enable multiple CPUs to enter into U-Boot"
 
