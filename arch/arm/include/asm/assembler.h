@@ -93,4 +93,22 @@
 #define CALGN(code...) code
 #endif
 
+/*
+ * Select code when configured for BE.
+ */
+#if CONFIG_IS_ENABLED(SYS_BIG_ENDIAN)
+#define CPU_BE(code...) code
+#else
+#define CPU_BE(code...)
+#endif
+
+/*
+ * Select code when configured for LE.
+ */
+#if CONFIG_IS_ENABLED(SYS_BIG_ENDIAN)
+#define CPU_LE(code...)
+#else
+#define CPU_LE(code...) code
+#endif
+
 #endif
