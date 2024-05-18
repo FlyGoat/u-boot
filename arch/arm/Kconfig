@@ -152,8 +152,7 @@ config GPIO_EXTRA_HEADER
 
 # Used for compatibility with asm files copied from the kernel
 config ARM_ASM_UNIFIED
-	bool
-	default y
+	def_bool !ARM64
 
 # Used for compatibility with asm files copied from the kernel
 config THUMB2_KERNEL
