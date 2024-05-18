@@ -10,7 +10,11 @@
 #include <config.h>
 #include <asm/psci.h>
 
+#ifdef CONFIG_SYS_BIG_ENDIAN
+OUTPUT_FORMAT("elf64-bigaarch64", "elf64-bigaarch64", "elf64-bigaarch64")
+#else
 OUTPUT_FORMAT("elf64-littleaarch64", "elf64-littleaarch64", "elf64-littleaarch64")
+#endif
 OUTPUT_ARCH(aarch64)
 ENTRY(_start)
 SECTIONS

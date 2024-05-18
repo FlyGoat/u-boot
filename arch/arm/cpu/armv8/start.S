@@ -53,6 +53,25 @@ _bss_end_ofs:
 	.quad	__bss_end - _start
 
 reset:
+	switch_el x9, 3f, 2f, 1f
+3:	mrs	x8, sctlr_el3
+	b	0f
+2:	mrs	x8, sctlr_el2
+	b	0f
+1:	mrs	x8, sctlr_el1
+	mov	x9, #(CR_EOE)
+	orn	x8, x9, x8
+0:
+	mov	x9, #(CR_EE)
+	orn	x8, x9, x8
+	switch_el x9, 3f, 2f, 1f
+3:	msr	sctlr_el3, x8
+	b	0f
+2:	msr	sctlr_el2, x8
+	b	0f
+1:	msr	sctlr_el1, x8
+0:	isb
+
 	/* Allow the board to save important registers */
 	b	save_boot_params
 .globl	save_boot_params_ret

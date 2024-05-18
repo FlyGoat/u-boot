@@ -135,6 +135,7 @@ config GICV3_SUPPORT_GIC600
 
 config STATIC_RELA
 	bool
+	depends on SYS_LITTLE_ENDIAN
 	default y if ARM64
 
 config DMA_ADDR_T_64BIT

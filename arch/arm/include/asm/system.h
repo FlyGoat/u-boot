@@ -15,6 +15,7 @@
 #define CR_SA		(1 << 3)	/* Stack Alignment Check Enable	*/
 #define CR_I		(1 << 12)	/* Icache enable		*/
 #define CR_WXN		(1 << 19)	/* Write Permision Imply XN	*/
+#define CR_EOE		(1 << 24)	/* Endianness of EL0		*/
 #define CR_EE		(1 << 25)	/* Exception (Big) Endian	*/
 
 #define ES_TO_AARCH64		1
@@ -58,7 +59,13 @@
  */
 #define SCTLR_EL2_RES1		(3 << 28 | 3 << 22 | 1 << 18 | 1 << 16 |\
 				 1 << 11 | 3 << 4)	    /* Reserved, RES1 */
+#define SCTLR_EL2_EE_BE		(1 << 25) /* Exception Little-endian          */
 #define SCTLR_EL2_EE_LE		(0 << 25) /* Exception Little-endian          */
+#ifdef CONFIG_SYS_BIG_ENDIAN
+#define SCTLR_EL2_EE_CUR     SCTLR_EL2_EE_BE
+#else
+#define SCTLR_EL2_EE_CUR     SCTLR_EL2_EE_LE
+#endif
 #define SCTLR_EL2_WXN_DIS	(0 << 19) /* Write permission is not XN       */
 #define SCTLR_EL2_ICACHE_DIS	(0 << 12) /* Instruction cache disabled       */
 #define SCTLR_EL2_SA_DIS	(0 << 3)  /* Stack Alignment Check disabled   */
