@@ -12,6 +12,8 @@ spin_table_reserve_begin:
 0:	wfe
 	ldr	x0, spin_table_cpu_release_addr
 	cbz	x0, 0b
+	/* spin-table is always little endian */
+CPU_BE(	rev	x0, x0)
 	br	x0
 .globl spin_table_cpu_release_addr
 	.align	3
