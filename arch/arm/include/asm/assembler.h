@@ -14,6 +14,9 @@
  *  assembler source.
  */
 
+#ifndef __ASM_ARM_ASSEMBLER_H
+#define __ASM_ARM_ASSEMBLER_H
+
 #include <asm/unified.h>
 
 /*
@@ -56,6 +59,7 @@
 #define PLD(code...)
 #endif
 
+#if !defined(__aarch64__)
 /*
  * Use 'bx lr' everywhere except ARMv4 (without 'T') where only 'mov pc, lr'
  * works
@@ -75,6 +79,7 @@
 #endif
 	.endm
 	.endr
+#endif
 
 /*
  * Cache aligned, used for optimized memcpy/memset
@@ -86,4 +91,6 @@
 #define CALGN(code...)
 #else
 #define CALGN(code...) code
+#endif
+
 #endif
