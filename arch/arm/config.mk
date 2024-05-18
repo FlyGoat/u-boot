@@ -34,9 +34,23 @@ PLATFORM_RELFLAGS	+= $(LLVM_RELFLAGS)
 PLATFORM_CPPFLAGS += -D__ARM__
 
 ifdef CONFIG_ARM64
+ifdef CONFIG_SYS_BIG_ENDIAN
+PLATFORM_ELFFLAGS += -B aarch64 -O elf64-bigaarch64
+else
 PLATFORM_ELFFLAGS += -B aarch64 -O elf64-littleaarch64
+endif
 else
 PLATFORM_ELFFLAGS += -B arm -O elf32-littlearm
+endif
+
+ifdef CONFIG_SYS_LITTLE_ENDIAN
+KBUILD_LDFLAGS += -EL
+PLATFORM_CPPFLAGS += -mlittle-endian
+endif
+
+ifdef CONFIG_SYS_BIG_ENDIAN
+KBUILD_LDFLAGS += -EB
+PLATFORM_CPPFLAGS += -mbig-endian
 endif
 
 # Choose between ARM/Thumb instruction sets
