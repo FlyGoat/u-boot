@@ -11,12 +11,18 @@
  *	Aneesh V <aneesh@ti.com>
  */
 
+#include <config.h>
+
 MEMORY { .sram : ORIGIN = IMAGE_TEXT_BASE,
 		LENGTH = IMAGE_MAX_SIZE }
 MEMORY { .sdram : ORIGIN = CONFIG_SPL_BSS_START_ADDR,
 		LENGTH = CONFIG_SPL_BSS_MAX_SIZE }
 
+#if CONFIG_IS_ENABLED(SYS_BIG_ENDIAN)
+OUTPUT_FORMAT("elf64-bigaarch64", "elf64-bigaarch64", "elf64-bigaarch64")
+#else
 OUTPUT_FORMAT("elf64-littleaarch64", "elf64-littleaarch64", "elf64-littleaarch64")
+#endif
 OUTPUT_ARCH(aarch64)
 ENTRY(_start)
 SECTIONS
