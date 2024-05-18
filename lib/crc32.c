@@ -183,10 +183,9 @@ const uint32_t * ZEXPORT get_crc_table()
 uint32_t __efi_runtime crc32_no_comp(uint32_t crc, const Bytef *buf, uInt len)
 {
 #ifdef CONFIG_ARM64_CRC32
-    crc = cpu_to_le32(crc);
     while (len--)
         crc = __builtin_aarch64_crc32b(crc, *buf++);
-    return le32_to_cpu(crc);
+    return crc;
 #else
     const uint32_t *tab = crc_table;
     const uint32_t *b =(const uint32_t *)buf;
