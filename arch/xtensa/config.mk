@@ -7,3 +7,6 @@ PLATFORM_CPPFLAGS += -D__XTENSA__ -mlongcalls -mforce-no-pic \
 		     -ffunction-sections -fdata-sections
 
 LDFLAGS_FINAL += --gc-sections
+
+PLATFORM_ELFFLAGS += -B xtensa -O elf32-xtensa-le
+
