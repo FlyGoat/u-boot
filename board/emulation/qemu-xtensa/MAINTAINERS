@@ -1,0 +1,7 @@
+QEMU XTENSA 'VIRT' BOARD
+M:	Jiaxun Yang <jiaxun.yang@flygoat.com>
+S:	Maintained
+F:	board/emulation/qemu-xtensa/
+F:	board/emulation/common/
+F:	include/configs/qemu-riscv.h
+F:	configs/qemu-xtensa-dc232b_defconfig
