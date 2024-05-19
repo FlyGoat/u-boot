@@ -38,6 +38,11 @@ Set the CROSS_COMPILE environment variable as usual, and run:
     make qemu_arm64_defconfig
     make
 
+- For AArch64 Big Endian::
+
+    make qemu_arm64be_defconfig
+    make
+
 Running U-Boot
 --------------
 The minimal QEMU command line to get U-Boot up and running is:
@@ -46,7 +51,7 @@ The minimal QEMU command line to get U-Boot up and running is:
 
     qemu-system-arm -machine virt -nographic -bios u-boot.bin
 
-- For AArch64::
+- For AArch64 (both endian)::
 
     qemu-system-aarch64 -machine virt -nographic -cpu cortex-a57 -bios u-boot.bin
 
