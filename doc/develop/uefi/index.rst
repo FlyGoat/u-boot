@@ -11,6 +11,7 @@ can be run an UEFI payload.
    :maxdepth: 2
 
    uefi.rst
+   uefi_supplement.rst
    u-boot_on_efi.rst
    iscsi.rst
    fwu_updates.rst
