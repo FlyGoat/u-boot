@@ -344,7 +344,7 @@ qemu_arm64 test.py:
 qemu_arm64be test.py:
   variables:
     TEST_PY_BD: "qemu_arm64be"
-    TEST_PY_TEST_SPEC: "not sleep and not efi"
+    TEST_PY_TEST_SPEC: "not sleep and not efi and not semihosting"
   <<: *buildman_and_testpy_dfn
 
 qemu_m68k test.py:

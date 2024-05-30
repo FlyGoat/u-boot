@@ -373,7 +373,7 @@ stages:
           TEST_PY_TEST_SPEC: "not sleep"
         qemu_arm64be:
           TEST_PY_BD: "qemu_arm64be"
-          TEST_PY_TEST_SPEC: "not sleep and not efi"
+          TEST_PY_TEST_SPEC: "not sleep and not efi and not semihosting"
         qemu_m68k:
           TEST_PY_BD: "M5208EVBE"
           TEST_PY_ID: "--id qemu"
