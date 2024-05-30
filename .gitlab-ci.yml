@@ -341,6 +341,12 @@ qemu_arm64 test.py:
     TEST_PY_TEST_SPEC: "not sleep"
   <<: *buildman_and_testpy_dfn
 
+qemu_arm64be test.py:
+  variables:
+    TEST_PY_BD: "qemu_arm64be"
+    TEST_PY_TEST_SPEC: "not sleep and not efi"
+  <<: *buildman_and_testpy_dfn
+
 qemu_m68k test.py:
   variables:
     TEST_PY_BD: "M5208EVBE"
