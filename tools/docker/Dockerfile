@@ -121,6 +121,10 @@ RUN apt-get update && apt-get install -y \
 	zip \
 	&& rm -rf /var/lib/apt/lists/*
 
+# Setup Git
+RUN git config --global user.name "U-Boot CI" && \
+	git config --global user.email u-boot@denx.de
+
 # Make kernels readable for libguestfs tools to work correctly
 RUN chmod +r /boot/vmlinu*
 
@@ -128,8 +132,6 @@ RUN chmod +r /boot/vmlinu*
 RUN git clone git://git.savannah.gnu.org/grub.git /tmp/grub && \
 	cd /tmp/grub && \
 	git checkout grub-2.06 && \
-	git config --global user.name "GitLab CI Runner" && \
-	git config --global user.email trini@konsulko.com && \
 	git cherry-pick 049efdd72eb7baa7b2bf8884391ee7fe650da5a0 && \
 	git cherry-pick 403d6540cd608b2706cfa0cb4713f7e4b490ff45 && \
 	./bootstrap && \
@@ -180,9 +182,6 @@ RUN git clone git://git.savannah.gnu.org/grub.git /tmp/grub && \
 RUN git clone https://gitlab.com/qemu-project/qemu.git /tmp/qemu && \
 	cd /tmp/qemu && \
 	git checkout v8.2.0 && \
-	# config user.name and user.email to make 'git am' happy
-	git config user.name u-boot && \
-	git config user.email u-boot@denx.de && \
 	git format-patch 0c7ffc977195~..0c7ffc977195 && \
 	git am 0001-hw-net-cadence_gem-Fix-MDIO_OP_xxx-values.patch && \
 	git cherry-pick d3c79c3974 && \
