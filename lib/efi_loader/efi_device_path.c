@@ -18,7 +18,7 @@
 #include <efi_loader.h>
 #include <part.h>
 #include <uuid.h>
-#include <asm-generic/unaligned.h>
+#include <asm/unaligned.h>
 #include <linux/compat.h> /* U16_MAX */
 
 /* template END node: */
@@ -867,13 +867,6 @@ static void path_to_uefi(void *uefi, const char *src)
 {
 	u16 *pos = uefi;
 
-	/*
-	 * efi_set_bootdev() calls this routine indirectly before the UEFI
-	 * subsystem is initialized. So we cannot assume unaligned access to be
-	 * enabled.
-	 */
-	allow_unaligned();
-
 	while (*src) {
 		s32 code = utf8_get(&src);
 
@@ -883,7 +876,7 @@ static void path_to_uefi(void *uefi, const char *src)
 			code = '\\';
 		utf16_put(code, &pos);
 	}
-	*pos = 0;
+	put_unaligned_le16(0, pos);
 }
 
 /**
