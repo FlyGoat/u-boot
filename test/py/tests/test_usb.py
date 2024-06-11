@@ -564,6 +564,7 @@ def test_usb_load(u_boot_console):
                     part_detect = 1
                     addr = u_boot_utils.find_ram_base(u_boot_console)
 
+                    file, size = 0, 0
                     if fs == 'fat':
                         file, size = test_usb_fatload_fatwrite(u_boot_console)
                     elif fs == 'ext4':

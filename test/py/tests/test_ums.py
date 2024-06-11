@@ -118,6 +118,7 @@ def test_ums(u_boot_console, env__usb_dev_port, env__block_devs):
 
     test_f = u_boot_utils.PersistentRandomFile(u_boot_console, 'ums.bin',
         1024 * 1024);
+    mounted_test_fn = None
     if have_writable_fs_partition:
         mounted_test_fn = mount_point + '/' + mount_subdir + test_f.fn
 

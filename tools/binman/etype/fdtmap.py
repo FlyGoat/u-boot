@@ -106,6 +106,7 @@ class Entry_fdtmap(Entry):
         Returns:
             FDT map binary data
         """
+        fsw = None
         def _AddNode(node):
             """Add a node to the FDT map"""
             for pname, prop in node.props.items():
