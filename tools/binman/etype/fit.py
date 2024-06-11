@@ -808,6 +808,7 @@ class Entry_fit(Entry_section):
             data_size = fdt_util.GetInt(node, "data-size")
 
             # Contents are inside the FIT
+            offset, size = 0, 0
             if data_prop is not None:
                 # GetOffset() returns offset of a fdt_property struct,
                 # which has 3 fdt32_t members before the actual data.

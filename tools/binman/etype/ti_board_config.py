@@ -118,6 +118,7 @@ class Entry_ti_board_config(Entry_section):
         Returns:
             array of bytes representing value
         """
+        br = None
         size = 0
         if (data_type == '#/definitions/u8'):
             size = 1

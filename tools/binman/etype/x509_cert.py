@@ -83,6 +83,7 @@ class Entry_x509_cert(Entry_collection):
         output_fname = tools.get_output_filename('cert.%s' % uniq)
         input_fname = tools.get_output_filename('input.%s' % uniq)
         config_fname = tools.get_output_filename('config.%s' % uniq)
+        stdout = None
         tools.write_file(input_fname, input_data)
         if type == 'generic':
             stdout = self.openssl.x509_cert(
