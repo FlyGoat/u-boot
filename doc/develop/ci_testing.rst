@@ -46,9 +46,10 @@ resources the project has available.  For Custodians, it is a matter of
 enabling the pipeline feature in your project repository following the standard
 GitLab documentation.  For non-custodians, the pipeline itself is part of the
 tree and should be able to be used on any GitLab instance, with whatever
-runners you are able to provide.  While it is intended to be able to run this
-pipeline on the free public instances provided at https://gitlab.com/ a problem
-with our squashfs tests currently prevents this.
+runners you are able to provide.  To run this pipeline on the free public
+instances provided at https://gitlab.com/ you will need to fork the repository,
+enable the CI/CD feature [1]_ for the repository, rise pipeline timeout [2]_ to
+at least 2 hours and then push your changes to the repository.
 
 To push to Gitlab without triggering a pipeline use:
 
@@ -74,3 +75,8 @@ developing features.  In that case, it can be useful as part of your own
 testing cycle to edit these pipelines in separate local commits to pair them
 down to just the jobs you're interested in.  These changes must be removed
 prior to submission.
+
+References
+----------
+.. [1] https://docs.gitlab.com/ee/ci/quick_start/
+.. [2] https://docs.gitlab.com/ee/ci/pipelines/settings.html#set-a-limit-for-how-long-jobs-can-run
