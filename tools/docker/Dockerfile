@@ -276,9 +276,9 @@ USER uboot:uboot
 
 # Populate the cache for pip to use. Get these via wget as the
 # COPY / ADD directives don't work as we need them to.
-RUN wget -O /tmp/pytest-requirements.txt https://source.denx.de/u-boot/u-boot/-/raw/master/test/py/requirements.txt
-RUN wget -O /tmp/sphinx-requirements.txt https://source.denx.de/u-boot/u-boot/-/raw/master/doc/sphinx/requirements.txt
-RUN wget -O /tmp/buildman-requirements.txt https://source.denx.de/u-boot/u-boot/-/raw/master/tools/buildman/requirements.txt
+RUN wget -O /tmp/pytest-requirements.txt https://gitlab.com/FlyGoat/u-boot/-/raw/b4/docker-image/test/py/requirements.txt
+RUN wget -O /tmp/sphinx-requirements.txt https://gitlab.com/FlyGoat/u-boot/-/raw/b4/docker-image/doc/sphinx/requirements.txt
+RUN wget -O /tmp/buildman-requirements.txt https://gitlab.com/FlyGoat/u-boot/-/raw/b4/docker-image/tools/buildman/requirements.txt
 RUN virtualenv -p /usr/bin/python3 /tmp/venv && \
 	. /tmp/venv/bin/activate && \
 	pip install -r /tmp/pytest-requirements.txt \
