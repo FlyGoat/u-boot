@@ -11,6 +11,7 @@
 #include <efi_loader.h>
 #include <errno.h>
 #include <malloc.h>
+#include <asm/unaligned.h>
 
 /**
  * codepage_437 - Unicode to codepage 437 translation table
@@ -215,7 +216,7 @@ s32 utf16_get(const u16 **src)
 		return -1;
 	if (!**src)
 		return 0;
-	code = **src;
+	code = get_unaligned_le16(*src);
 	++*src;
 	if (code >= 0xDC00 && code <= 0xDFFF)
 		return -1;
@@ -242,12 +243,12 @@ int utf16_put(s32 code, u16 **dst)
 	if ((code >= 0xD800 && code <= 0xDFFF) || code >= 0x110000)
 		return -1;
 	if (code < 0x10000) {
-		**dst = code;
+		put_unaligned_le16(code, *dst);
 	} else {
 		code -= 0x10000;
-		**dst = code >> 10 | 0xD800;
+		put_unaligned_le16(code >> 10 | 0xD800, *dst);
 		++*dst;
-		**dst = (code & 0x3ff) | 0xDC00;
+		put_unaligned_le16((code & 0x3ff) | 0xDC00, *dst);
 	}
 	++*dst;
 	return 0;
@@ -392,7 +393,7 @@ int __efi_runtime u16_strncmp(const u16 *s1, const u16 *s2, size_t n)
 	int ret = 0;
 
 	for (; n; --n, ++s1, ++s2) {
-		ret = *s1 - *s2;
+		ret = get_unaligned_le16(s1) - get_unaligned_le16(s2);
 		if (ret || !*s1)
 			break;
 	}
@@ -403,7 +404,7 @@ int __efi_runtime u16_strncmp(const u16 *s1, const u16 *s2, size_t n)
 size_t __efi_runtime u16_strnlen(const u16 *in, size_t count)
 {
 	size_t i;
-	for (i = 0; count-- && in[i]; i++);
+	for (i = 0; count-- && get_unaligned_le16(in + i); i++);
 	return i;
 }
 
@@ -417,8 +418,10 @@ u16 *u16_strcpy(u16 *dest, const u16 *src)
 	u16 *tmp = dest;
 
 	for (;; dest++, src++) {
-		*dest = *src;
-		if (!*src)
+		u16 code = get_unaligned_le16(src);
+
+		put_unaligned_le16(code, dest);
+		if (!code)
 			break;
 	}
 
@@ -463,7 +466,7 @@ uint8_t *utf16_to_utf8(uint8_t *dest, const uint16_t *src, size_t size)
 	uint32_t code_high = 0;
 
 	while (size--) {
-		uint32_t code = *src++;
+		uint32_t code = get_unaligned_le16(src++);
 
 		if (code_high) {
 			if (code >= 0xDC00 && code <= 0xDFFF) {
