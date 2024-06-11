@@ -50,6 +50,10 @@ stages:
     - if [ -n "${BUILD_ENV}" ]; then
         export ${BUILD_ENV};
       fi
+    - virtualenv -p /usr/bin/python3 /tmp/venv
+    - . /tmp/venv/bin/activate
+    - pip install -r tools/buildman/requirements.txt
+    - pip install -r test/py/requirements.txt
     - tools/buildman/buildman -o ${UBOOT_TRAVIS_BUILD_DIR} -w -E -W -e
         --board ${TEST_PY_BD} ${OVERRIDE}
     - cp ~/grub_x86.efi $UBOOT_TRAVIS_BUILD_DIR/
@@ -74,9 +78,6 @@ stages:
         /opt/coreboot/cbfstool ${UBOOT_TRAVIS_BUILD_DIR}/coreboot.rom remove -n fallback/payload;
         /opt/coreboot/cbfstool ${UBOOT_TRAVIS_BUILD_DIR}/coreboot.rom add-flat-binary -f ${UBOOT_TRAVIS_BUILD_DIR}/u-boot.bin -n fallback/payload -c LZMA -l 0x1110000 -e 0x1110000;
       fi
-    - virtualenv -p /usr/bin/python3 /tmp/venv
-    - . /tmp/venv/bin/activate
-    - pip install -r test/py/requirements.txt
     # "${var:+"-k $var"}" expands to "" if $var is empty, "-k $var" if not
     - export PATH=/opt/qemu/bin:/tmp/uboot-test-hooks/bin:${PATH};
       export PYTHONPATH=/tmp/uboot-test-hooks/py/travis-ci;
@@ -100,7 +101,6 @@ build all 32bit ARM platforms:
   script:
     - ret=0;
       git config --global --add safe.directory "${CI_PROJECT_DIR}";
-      pip install -r tools/buildman/requirements.txt;
       ./tools/buildman/buildman -o /tmp -PEWM arm -x aarch64 || ret=$?;
       if [[ $ret -ne 0 ]]; then
         ./tools/buildman/buildman -o /tmp -seP;
@@ -114,7 +114,6 @@ build all 64bit ARM platforms:
     - . /tmp/venv/bin/activate
     - ret=0;
       git config --global --add safe.directory "${CI_PROJECT_DIR}";
-      pip install -r tools/buildman/requirements.txt;
       ./tools/buildman/buildman -o /tmp -PEWM aarch64 || ret=$?;
       if [[ $ret -ne 0 ]]; then
         ./tools/buildman/buildman -o /tmp -seP;
@@ -212,6 +211,8 @@ Run pylint:
   extends: .testsuites
   script:
     - git config --global --add safe.directory "${CI_PROJECT_DIR}"
+    - virtualenv -p /usr/bin/python3 /tmp/venv;
+    - . /tmp/venv/bin/activate;
     - pip install -r test/py/requirements.txt
     - pip install -r tools/buildman/requirements.txt
     - pip install asteval pylint==3.2.3 pyopenssl
@@ -240,6 +241,8 @@ Check for pre-schema tags:
 Check packing of Python tools:
   extends: .testsuites
   script:
+    - virtualenv -p /usr/bin/python3 /tmp/venv;
+    - . /tmp/venv/bin/activate;
     - make pip
 
 # Test sandbox with test.py
