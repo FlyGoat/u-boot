@@ -332,6 +332,7 @@ stages:
           docker run "$@" --device /dev/fuse:/dev/fuse \
                          -v $PWD:$(work_dir) \
                          -v $(Pipeline.Workspace):$(Pipeline.Workspace) \
+                         -e QEMU_AUDIO_DRV="none" \
                          -e WORK_DIR="${WORK_DIR}" \
                          -e TEST_PY_BD="${TEST_PY_BD}" \
                          -e TEST_PY_ID="${TEST_PY_ID}" \
