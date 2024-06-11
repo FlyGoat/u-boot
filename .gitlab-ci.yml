@@ -92,56 +92,71 @@ stages:
       - "*.css"
     expire_in: 1 week
 
-.world_build:
+.world_build_template: &world_build_dfn
   stage: world build
   rules:
     - when: always
-
-build all 32bit ARM platforms:
-  extends: .world_build
   script:
     - ret=0;
       git config --global --add safe.directory "${CI_PROJECT_DIR}";
-      ./tools/buildman/buildman -o /tmp -PEWM arm -x aarch64 || ret=$?;
-      if [[ $ret -ne 0 ]]; then
-        ./tools/buildman/buildman -o /tmp -seP;
-        exit $ret;
-      fi;
+      if [[ "${BUILDMAN}" != "" ]]; then
+          ret=0;
+          tools/buildman/buildman -o /tmp -PEWM ${BUILDMAN} ${OVERRIDE} || ret=$?;
+          if [[ $ret -ne 0 ]]; then
+              tools/buildman/buildman -o /tmp -seP ${BUILDMAN};
+              exit $ret;
+          fi;
+      fi
 
-build all 64bit ARM platforms:
-  extends: .world_build
-  script:
-    - virtualenv -p /usr/bin/python3 /tmp/venv
-    - . /tmp/venv/bin/activate
-    - ret=0;
-      git config --global --add safe.directory "${CI_PROJECT_DIR}";
-      ./tools/buildman/buildman -o /tmp -PEWM aarch64 || ret=$?;
-      if [[ $ret -ne 0 ]]; then
-        ./tools/buildman/buildman -o /tmp -seP;
-        exit $ret;
-      fi;
+am33xx_at91_kirkwood_mvebu_omap:
+  variables:
+    BUILDMAN: "am33xx at91_kirkwood mvebu omap -x siemens"
+  <<: *world_build_dfn
 
-build all PowerPC platforms:
-  extends: .world_build
-  script:
-    - ret=0;
-      git config --global --add safe.directory "${CI_PROJECT_DIR}";
-      ./tools/buildman/buildman -o /tmp -P -E -W powerpc || ret=$?;
-      if [[ $ret -ne 0 ]]; then
-        ./tools/buildman/buildman -o /tmp -seP;
-        exit $ret;
-      fi;
+amlogic_bcm_boundary_engicam_siemens_technexion_oradex:
+  variables:
+    BUILDMAN: "amlogic bcm boundary engicam siemens technexion toradex -x mips"
+  <<: *world_build_dfn
 
-build all other platforms:
-  extends: .world_build
-  script:
-    - ret=0;
-      git config --global --add safe.directory "${CI_PROJECT_DIR}";
-      ./tools/buildman/buildman -o /tmp -PEWM -x arm,powerpc || ret=$?;
-      if [[ $ret -ne 0 ]]; then
-        ./tools/buildman/buildman -o /tmp -seP;
-        exit $ret;
-      fi;
+arm_nxp_minus_imx:
+  variables:
+    BUILDMAN: "freescale -x powerpc,m68k,imx,mx"
+  <<: *world_build_dfn
+
+imx:
+  variables:
+    BUILDMAN: "mx imx -x boundary,engicam,technexion,toradex"
+  <<: *world_build_dfn
+
+rk:
+  variables:
+    BUILDMAN: "rk"
+  <<: *world_build_dfn
+
+sunxi:
+  variables:
+    BUILDMAN: "sunxi"
+  <<: *world_build_dfn
+
+powerpc:
+  variables:
+    BUILDMAN: "powerpc"
+  <<: *world_build_dfn
+
+arm_catch_all:
+  variables:
+    BUILDMAN: "arm -x aarch64,am33xx,at91,bcm,ls1,kirkwood,mvebu,omap,rk,siemens,mx,sunxi,technexion,toradex"
+  <<: *world_build_dfn
+
+aarch64_catch_all:
+  variables:
+    BUILDMAN: "aarch64 -x amlogic,bcm,engicam,imx,ls1,ls2,lx216,mvebu,rk,siemens,sunxi,toradex"
+  <<: *world_build_dfn
+
+everything_but_arm_and_powerpc:
+  variables:
+    BUILDMAN: "-x arm,powerpc"
+  <<: *world_build_dfn
 
 .testsuites:
   stage: testsuites
