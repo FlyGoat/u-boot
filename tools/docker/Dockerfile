@@ -205,7 +205,7 @@ RUN git clone https://gitlab.com/qemu-project/qemu.git /tmp/qemu && \
 	rm -rf /tmp/qemu
 
 # Build fiptool
-RUN git clone https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git /tmp/tf-a && \
+RUN git clone https://github.com/ARM-software/arm-trusted-firmware.git /tmp/tf-a && \
 	cd /tmp/tf-a/ && \
 	git checkout lts-v2.10.4 && \
 	cd tools/fiptool && \
@@ -260,6 +260,8 @@ RUN mkdir /tmp/trace && \
 # Build coreboot
 RUN wget -O - https://coreboot.org/releases/coreboot-24.05.tar.xz | tar -C /tmp -xJ && \
     cd /tmp/coreboot-24.05 && \
+    sed -i 's,https://ftpmirror.gnu.org,https://ftp.gnu.org/gnu,g' ./util/crossgcc/buildgcc && \
+    sed -i 's,NASM_BASE_URL=.*,NASM_BASE_URL="https://distfiles.macports.org/nasm",g' ./util/crossgcc/buildgcc && \
     make crossgcc-i386 CPUS=$(nproc) && \
     make -C payloads/coreinfo olddefconfig && \
     make -C payloads/coreinfo && \
