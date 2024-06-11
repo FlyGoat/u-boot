@@ -277,6 +277,7 @@ def MicrocodeTool():
     if cmd not in commands:
         parser.error("Unknown command '%s'" % cmd)
 
+    date, license_text, microcodes = None, None, None
     if (not not options.mcfile) != (not not options.mcfile):
         parser.error("You must specify either header files or a microcode file, not both")
     if options.headerfile:

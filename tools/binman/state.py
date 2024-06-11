@@ -406,6 +406,7 @@ def CheckSetHashValue(node, get_data_func):
     hash_node = node.FindNode('hash')
     if hash_node:
         algo = hash_node.props.get('algo').value
+        data = None
         if algo == 'sha256':
             m = hashlib.sha256()
             m.update(get_data_func())

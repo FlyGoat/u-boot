@@ -530,4 +530,6 @@ index 0000000..2234c87
 
 if __name__ == "__main__":
     unittest.main()
+    # pylint doesn't seem to find this
+    # pylint: disable=E1101
     gitutil.RunTests()
