@@ -6293,6 +6293,7 @@ fdt         fdtmap                Extract the devicetree blob from the fdtmap
             re_name = re.compile('_binman_(u_boot_(.*))_prop_(.*)')
             for name, sym in syms.items():
                 msg = 'test'
+                expect_val = None
                 val = elf.GetSymbolValue(sym, edata, msg)
                 entry_m = re_name.match(name)
                 if entry_m:

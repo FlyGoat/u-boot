@@ -1066,6 +1066,7 @@ class Builder:
             printed_target = False
             for name in sorted(result):
                 diff = result[name]
+                color = None
                 if name.startswith('_'):
                     continue
                 if diff != 0:
@@ -1326,6 +1327,7 @@ class Builder:
             for line in lines:
                 if not line:
                     continue
+                col = None
                 if line[0] == '+':
                     col = self.col.GREEN
                 elif line[0] == '-':
